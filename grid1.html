@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> One Player </title>
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background-color: #ffffff;
+            }
+            
+            h2 {
+                margin-bottom: 20px;
+                font-size: 2rem;
+                color: #333;
+            }
+            .grid {
+                
+                grid-template-columns: 100px 100px 100px;
+                grid-template-rows: 100px 100px 100px;
+                gap: none;
+                background-color: #fff;
+                padding: 10px;
+                
+            }
+            .cell {
+                width: 100px;
+                height: 100px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 2px solid black;
+                border-top: none;
+                border-left: none;
+                font-size: 2rem;
+                cursor: pointer;
+            }
+            .cell:nth-child(n+1){
+                border-top: none;
+            }
+            .cell:nth-child(3n+1){
+                border-top: none;
+            }
+            .cell:nth-child(n+7){
+                border-bottom: none;
+            }
+            .cell:nth-child(3n){
+                border-right: none;
+            }
+            a.button-container {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+            a.button {
+                font-family: 'Geneva'; 
+                width: 150px; 
+                height: 60px; 
+                line-height: 60px; 
+                padding: 0; 
+                font-size: 110%; 
+                background-color: #00bfff;
+                color: white;
+                text-align: center; 
+                text-decoration: none; 
+                border: 1px outset buttonborder; 
+                border-radius: 5px; 
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                box-sizing: border-box; 
+                
+            }
+            button {
+                width: 150px; 
+                height: 60px;
+                padding: 0; 
+                font-size: 150%;
+                font-family: 'Courier New'; 
+                background-color: #007BFF;
+                color: white;
+                text-align: center; 
+                border: 1px outset buttonborder; 
+                border-radius: 5px; 
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                box-sizing: border-box; 
+                overflow: hidden; 
+                white-space: nowrap; 
+            }
+            .button-container {
+                display: flex;
+                justify-content: space-between; 
+                width: 25%;
+                margin: 0 auto; 
+                margin-bottom: 20px; 
+            }
+            
+        </style>
+    </head>
+    <body>
+        <h2 id = 'winLose'> Would you like to Move First or Second? </h2>
+        
+        <div id = 'XO' class = 'button-container'>
+            <button class = 'button' id = 'X' onclick = 'startClick("X")'> First </button>
+            <button class = 'button' id = 'O' onclick = 'startClick("O")'> Second </button>
+        </div>
+        
+        <div id = 'grid' class="grid" style = 'display:none'>
+            <div class = "cell" id = '1' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '2' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '3' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '4' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '5' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '6' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '7' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '8' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '9' onclick = "makeMove(this)"></div>
+        </div>
+        <div class="button-container">
+            <a id = 'home' href = 'homepage.html' style="display:none" class = "button"> Return to Home </a>
+            <a id = 'again' href = 'grid1.html' style="display:none" class = "button"> Play Again </a>
+        </div>
+
+        <script>
+            let moveNum = 0;
+            let moveArr = Array(9).fill('');
+            let current = 'X';
+            let player = 'X';
+            let ai = 'O';
+            function startClick(id){
+                document.getElementById('XO').style.display = 'none';
+                if(id === 'X'){
+                    document.getElementById('winLose').innerHTML =  "Your Turn!"
+
+                }
+                else {
+                    document.getElementById('winLose').innerHTML =  "AI is thinking..."
+                    current = 'X';
+                    player = 'O';
+                    ai = 'X';
+                    setTimeout(aiMove, 500);
+                }
+                document.getElementById('grid').style.display = 'grid';
+                return id;
+            }
+
+            
+            function makeMove(cell) {
+                
+                if (cell.textContent === '' && current === player) {
+                    cell.textContent = current;
+                    moveArr[cell.id - 1] = player;
+                    moveNum ++;
+                    if(checkWin() === player){
+                    document.getElementById('winLose').innerHTML = 'You Win!';
+                    finalbutton();
+                    document.getElementById('grid').style.pointerEvents = 'none';
+                    }
+                    if(moveNum === 9){
+                        document.getElementById('winLose').innerHTML = `It's a tie!`;
+                        finalbutton();
+                        document.getElementById('grid').style.pointerEvents = 'none';
+                    }
+                    else{
+                        document.getElementById('winLose').innerHTML = 'AI is thinking...';
+                        current = ai;
+                        setTimeout(aiMove, 500);
+                    }
+                }
+            }
+
+
+            function aiMove(){
+                document.getElementById('grid').style.pointerEvents = 'none';
+                let score = -Infinity;
+                let aimove = null;
+                for(let i = 0; i < 9; i++){
+                    if(!moveArr[i]){
+                        moveArr[i] = ai;
+                        let currScore = minimax(moveArr, false);
+                        moveArr[i] = undefined;
+                        if (currScore > score){
+                            score = currScore;
+                            aimove = i;
+                        }
+                    }
+                }
+
+                if (aimove !== null) {
+                    moveArr[aimove] = ai;
+                    document.getElementById((aimove + 1).toString()).textContent = ai; 
+                    moveNum ++;
+                }
+
+                if(checkWin() === ai){
+                    document.getElementById('winLose').innerHTML = 'AI Wins';
+                    finalbutton();
+                    document.getElementById('grid').style.pointerEvents = 'none';
+                }
+
+                if(moveNum === 9){
+                    document.getElementById('winLose').innerHTML = `It's a tie!`;
+                    finalbutton();
+                    document.getElementById('grid').style.pointerEvents = 'none';
+                }
+                
+                else{
+                    current = player;
+                    document.getElementById('winLose').innerHTML = 'Your Turn!';
+                    document.getElementById('grid').style.pointerEvents = 'auto';
+                }
+                
+            }
+
+
+            function minimax(newBoard, isMaximizing) {
+                const winner = checkWin();
+                if (winner === player) return -10;
+                if (winner === ai) return 10;
+                if (newBoard.every(cell => cell)) return 0; // Check for tie
+
+                if (isMaximizing) {
+                    let bestScore = -Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (!newBoard[i]) {
+                            newBoard[i] = ai;
+                            let score = minimax(newBoard, false);
+                            newBoard[i] = undefined;
+                            bestScore = Math.max(score, bestScore);
+                        }
+                    }
+                    return bestScore;
+                } else {
+                    let bestScore = Infinity;
+                    for (let i = 0; i < 9; i++) {
+                        if (!newBoard[i]) {
+                            newBoard[i] = player;
+                            let score = minimax(newBoard, true);
+                            newBoard[i] = undefined;
+                            bestScore = Math.min(score, bestScore);
+                        }
+                    }
+                    return bestScore;
+                }
+            }
+            function finalbutton(){
+                document.getElementById('home').style.display='inline-block';
+                document.getElementById('again').style.display='inline-block';
+            }
+            function checkWin() {
+                const winningCombinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+                for (const combination of winningCombinations){
+                    const [a,b,c] = combination;
+                    if(moveArr[a] && moveArr[b] === moveArr[a] && moveArr[c] === moveArr[a]){
+                        return moveArr[a];
+                    }
+                }
+                return null;
+            }
+
+            
+            
+        </script>
+    </body>
+</html>

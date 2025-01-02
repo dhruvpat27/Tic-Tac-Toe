@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Two-Player </title>
+        
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background-color: #ffffff;
+            }
+            
+            h2 {
+                margin-bottom: 20px;
+                font-size: 2rem;
+                color: #333;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: 100px 100px 100px;
+                grid-template-rows: 100px 100px 100px;
+                gap: none;
+                background-color: #fff;
+                padding: 10px;
+                
+            }
+            .cell {
+                width: 100px;
+                height: 100px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 2px solid black;
+                border-top: none;
+                border-left: none;
+                font-size: 2rem;
+                cursor: pointer;
+            }
+            .cell:nth-child(n+1){
+                border-top: none;
+            }
+            .cell:nth-child(3n+1){
+                border-top: none;
+            }
+            .cell:nth-child(n+7){
+                border-bottom: none;
+            }
+            .cell:nth-child(3n){
+                border-right: none;
+            }
+            a.button-container {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 20px;
+            }
+            a.button {
+                font-family: 'Geneva'; 
+                width: 150px; 
+                height: 60px; 
+                line-height: 60px; 
+                padding: 0; 
+                font-size: 110%; 
+                background-color: #007BFF;
+                color: white;
+                text-align: center; 
+                text-decoration: none; 
+                border: 1px outset buttonborder; 
+                border-radius: 5px; 
+                cursor: pointer;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+                box-sizing: border-box; 
+                
+            }
+            
+        </style>
+    </head>
+    <body>
+        <h2 id = 'winLose'> Two-Player Tic Tac Toe! </h2>
+        
+        
+        <div id = 'grid' class="grid">
+            <div class = "cell" id = '1' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '2' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '3' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '4' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '5' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '6' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '7' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '8' onclick = "makeMove(this)"></div>
+            <div class = "cell" id = '9' onclick = "makeMove(this)"></div>
+        </div>
+        <div class="button-container">
+            <a id = 'home' href = 'homepage.html' style="display:none" class = "button"> Return to Home </a>
+            <a id = 'again' href = 'grid2.html' style="display:none" class = "button"> Play Again </a>
+        </div>
+
+        <script>
+            let currentPlayer = 'X';
+            let move = 0;
+            const moveArr = [];
+            function makeMove(cell) {
+                if (cell.textContent === '') {
+                    cell.textContent = currentPlayer;
+                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    move++;
+                }
+                if (move % 2 == 1){
+                    moveArr[cell.id - 1] = 'X';
+                }
+                else{
+                    moveArr[cell.id - 1] = 'O';
+                }
+                if(checkWin()){
+                    document.getElementById("winLose").innerHTML = `${cell.textContent} wins!`;
+                    document.getElementById('home').style.display='inline-block';
+                    document.getElementById('again').style.display='inline-block';
+                    document.getElementById('grid').style.pointerEvents = 'none';
+                    return;
+                }
+                
+                if(move === 9 && !checkWin()){
+                    document.getElementById("winLose").innerHTML = `It's a tie!`;
+                    document.getElementById('home').style.display='inline-block';
+                    document.getElementById('again').style.display='inline-block';
+                    document.getElementById('grid').style.pointerEvents = 'none';
+                    return;
+                }
+            }
+
+            function checkWin() {
+                const winningCombinations = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+                for (const combination of winningCombinations){
+                    const [a,b,c] = combination;
+                    if(moveArr[a] && moveArr[b] === moveArr[a] && moveArr[c] === moveArr[a]){
+                        return true;
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>
